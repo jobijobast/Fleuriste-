@@ -336,23 +336,35 @@ fieldset{ border:0; margin:0; padding:0; min-width:0; }
   font-size:14px; line-height:1.5; letter-spacing:-.01em;
 }
 .cbt__m--elle{ background:var(--gris); border-bottom-left-radius:5px; align-self:flex-start; }
+.cbt__m a{ color:var(--rose-d); border-bottom:1px solid currentColor; }
+.cbt__m a:hover{ color:var(--encre); }
 .cbt__m--moi { background:var(--encre); color:var(--blanc); border-bottom-right-radius:5px; align-self:flex-end; }
 .js .cbt__m{ animation:bulle .4s var(--ease) both; }
 @keyframes bulle{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
 
 .cbt__bas{ flex:none; padding:14px 18px 18px; border-top:1px solid rgba(14,14,14,.1); }
-.cbt__ch{ display:flex; flex-wrap:wrap; gap:8px; }
-.cbt__ch button{
-  font:inherit; font-size:13px; letter-spacing:-.01em;
-  padding:9px 15px; border-radius:var(--r-pill);
-  border:1px solid rgba(14,14,14,.2); background:var(--blanc); color:var(--encre);
-  cursor:pointer;
-  transition:background .25s var(--ease), color .25s var(--ease), border-color .25s var(--ease);
+.cbt__saisie{ display:flex; gap:8px; }
+.cbt__saisie input{
+  flex:1; min-width:0; font:inherit; font-size:14px; color:var(--encre);
+  padding:10px 14px;
+  background:var(--blanc);
+  border:1px solid rgba(14,14,14,.2);
+  border-radius:var(--r-pill);
+  transition:border-color .3s var(--ease);
 }
-.cbt__ch button:hover{ background:var(--encre); color:var(--blanc); border-color:var(--encre); }
-.cbt__ch button.est-rose{ background:var(--rose); color:var(--blanc); border-color:var(--rose); }
-.cbt__ch button.est-rose:hover{ background:var(--encre); border-color:var(--encre); }
-.cbt__ch button:focus-visible{ outline:2px solid var(--rose-d); outline-offset:2px; }
+.cbt__saisie input::placeholder{ color:#8A8783; }
+.cbt__saisie input:hover{ border-color:rgba(14,14,14,.42); }
+.cbt__saisie input:focus-visible{ outline:2px solid var(--rose-d); outline-offset:2px; border-color:var(--rose-d); }
+.cbt__saisie button{
+  flex:none; width:40px; height:40px; border:0; border-radius:50%;
+  background:var(--rose); color:var(--blanc);
+  font:inherit; font-size:16px; line-height:1; cursor:pointer;
+  transition:background .3s var(--ease);
+}
+.cbt__saisie button:hover{ background:var(--encre); }
+.cbt__saisie button:focus-visible{ outline:2px solid var(--rose-d); outline-offset:2px; }
+.cbt__saisie input:disabled,
+.cbt__saisie button:disabled{ opacity:.5; cursor:default; }
 
 .cbt__ecrit{ display:flex; gap:4px; align-items:center; padding:4px 0 0; }
 .cbt__ecrit span{

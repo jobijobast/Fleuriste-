@@ -9,23 +9,21 @@ photographies (Unsplash).
 
 ## Lancer le site
 
-Il suffit d'un serveur statique, par exemple :
-
 ```bash
-python -m http.server 5199
+python proxy.py
 ```
 
-Puis ouvrir <http://localhost:5199>.
+Puis ouvrir <http://localhost:5199>. Ce script sert le site et fait tourner le
+conseiller floral (voir plus bas).
 
-Ouvrir `index.html` directement par double-clic fonctionne aussi, à ceci près
-que les liens entre pages restent corrects mais que certains navigateurs
-limitent les requêtes en `file://`.
+Un simple `python -m http.server 5199` suffit si le conseiller ne vous intéresse
+pas : tout le reste du site en est indépendant.
 
 ## Les pages
 
 | Fichier | Rôle |
 |---|---|
-| `index.html` | La vitrine : manifeste, services, bouquets de saison, réalisations, méthode, témoignages, FAQ |
+| `index.html` | La vitrine : manifeste, services, bouquets de saison, réalisations, méthode, témoignages, FAQ. Le hero est une vidéo (`media/hero.mp4`) |
 | `atelier.html` | Le composeur de bouquet, avec rendu visuel et prix en direct |
 | `devis.html` | Demande de devis pour un bouquet ou un événement, avec estimation chiffrée |
 
@@ -58,13 +56,43 @@ la rend partageable et permet de la transmettre à la page de devis.
 
 ## Le conseiller floral
 
-Trois questions à choix (occasion, ambiance, budget), puis une recommandation
-chiffrée et deux actions réelles : ouvrir la composition dans l'atelier, ou
-partir d'un bouquet déjà monté.
+Une barre de chat. Aucune réponse écrite d'avance : tout vient d'un modèle de
+langage, cadré par un prompt système qui lui interdit de sortir du sujet
+« fleurs et boutique ».
 
-Le déroulé est entièrement local et scripté : aucune requête réseau, aucune clé
-d'API, rien n'est envoyé nulle part. C'est un guide de choix, pas un modèle de
-langage, et l'en-tête du widget le dit explicitement.
+### Pourquoi un proxy
+
+`proxy.py` sert le site **et** relaie les questions vers le modèle. Deux raisons,
+toutes deux importantes :
+
+1. **La clé d'API ne descend jamais dans le navigateur.** Mise dans un fichier
+   `.js`, elle serait lisible par n'importe quel visiteur et récupérée en
+   quelques minutes par les robots qui scannent GitHub.
+2. **Le prompt système reste hors de portée.** Écrit côté navigateur, n'importe
+   qui le réécrirait depuis la console pour faire sortir le bot de son sujet.
+   Ici, personne n'y touche.
+
+### Mise en route
+
+```bash
+cp .env.exemple .env      # puis renseigner MV_CLE
+python proxy.py
+```
+
+`.env` est ignoré par Git. Le proxy accepte tout fournisseur compatible avec le
+format OpenAI : Mistral, OpenAI, Groq et autres, en changeant `MV_URL` et
+`MV_MODELE`.
+
+Sans clé, ou sur un hébergement statique sans serveur (GitHub Pages), il n'y a
+pas de modèle à interroger : le widget l'annonce et renvoie vers l'atelier.
+
+### Si le conseiller répond « je n'arrive pas à joindre l'atelier »
+
+Le terminal où tourne `proxy.py` affiche la cause exacte. Le cas le plus
+fréquent est un `429` : la clé est bonne, mais l'inférence n'est pas activée sur
+le compte. Chez Mistral, cela se règle dans *console.mistral.ai → Workspace →
+Billing*, en activant le plan gratuit (vérification par téléphone) ou en
+ajoutant un moyen de paiement. Aucun changement de code n'est nécessaire.
 
 ## Le devis
 

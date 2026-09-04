@@ -1,67 +1,34 @@
 /* =========================================================
    MAISON VERVEINE - le conseiller floral
-   Guide de choix entièrement local : trois questions, une
-   recommandation, deux actions réelles. Aucune requête
-   réseau, aucune clé d'API, rien n'est envoyé nulle part.
+
+   Chat libre. Aucune réponse écrite d'avance : tout ce que le
+   conseiller dit vient du modèle, via /api/chat.
+
+   La clé d'API et le prompt système vivent dans proxy.py, côté
+   serveur. Le navigateur ne les voit jamais. Écrire le périmètre
+   ici ne servirait à rien : n'importe qui peut réécrire ce
+   fichier depuis la console de son navigateur.
+
+   Sans proxy (ouverture du fichier en local, ou hébergement
+   statique type GitHub Pages), il n'y a pas de modèle à
+   interroger : le widget le dit et renvoie vers l'atelier.
    ========================================================= */
 
 (function () {
   'use strict';
 
   var AVATAR = 'https://images.unsplash.com/photo-1541166227079-140bd2c23b03?w=120&h=120&fit=crop&q=70&auto=format';
-
-  var OCCASIONS = [
-    { id:'mariage', l:'Un mariage' },
-    { id:'anniv',   l:'Un anniversaire' },
-    { id:'merci',   l:'Dire merci' },
-    { id:'deuil',   l:'Un deuil' },
-    { id:'offrir',  l:'Juste pour offrir' },
-    { id:'pro',     l:'Un événement pro' }
-  ];
-  var AMBIANCES = [
-    { id:'douce',   l:'Douce et pâle' },
-    { id:'coloree', l:'Colorée' },
-    { id:'blanche', l:'Blanche et graphique' },
-    { id:'sauvage', l:'Sauvage, champêtre' }
-  ];
-  var BUDGETS = [
-    { id:'a', l:'Moins de 50 €' },
-    { id:'b', l:'50 à 90 €' },
-    { id:'c', l:'90 à 150 €' },
-    { id:'d', l:'Plus de 150 €' }
-  ];
-
-  var BASE = {
-    douce:   { p:'renoncule',  s:'gypsophile', f:'eucalyptus' },
-    coloree: { p:'tulipe',     s:'dahlia',     f:'fougere' },
-    blanche: { p:'anemone',    s:'renonculeb', f:'ruscus' },
-    sauvage: { p:'lisianthus', s:'gypsophile', f:'fougere' }
-  };
-  var TAILLE = { a:{ t:'petit', w:'kraft' }, b:{ t:'moyen', w:'creme' },
-                 c:{ t:'grand', w:'creme' }, d:{ t:'grand', w:'lin' } };
-
-  var PRET = {
-    a:{ nom:'Le Petit Mardi', prix:'48 €' },
-    b:{ nom:'Renoncule & Eucalyptus', prix:'65 €' },
-    c:{ nom:'Blanc d’Hiver', prix:'92 €' },
-    d:{ nom:'La Gerbe des Halles', prix:'130 €' }
-  };
-
-  var INTRO = {
-    mariage:'Pour un mariage, un seul bouquet suffit rarement, mais voilà une base solide.',
-    anniv:  'Pour un anniversaire, on peut se permettre un peu de gaieté.',
-    merci:  'Pour dire merci, mieux vaut quelque chose de simple et bien fait.',
-    deuil:  'Sobre, sans effet, sans parfum trop fort : c’est ce qui convient le mieux.',
-    offrir: 'Offrir sans occasion, c’est la meilleure raison.',
-    pro:    'Pour un événement professionnel, il faut que ça tienne la soirée et que ça passe en photo.'
-  };
+  var MAX_HISTOIRE = 14;
 
   var reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var etat = { occasion:null, ambiance:null, budget:null };
-  var etape = 0;
-  var racine, bouton, fil, bas, ouvertPar;
+  var enLigne = false;
+  var occupe = false;
+  var histoire = [];
+  var racine, bouton, fil, saisie, champ, envoiBtn, sousTitre, ouvertPar;
 
-  /* ---------- construction du widget ---------- */
+  /* =========================================================
+     Widget
+     ========================================================= */
   function monte() {
     bouton = document.createElement('button');
     bouton.className = 'cbt-btn';
@@ -78,21 +45,59 @@
     racine.innerHTML =
       '<div class="cbt__top">' +
         '<span class="cbt__av" style="background-image:url(' + AVATAR + ')"></span>' +
-        '<span class="cbt__id"><b>Le conseiller floral</b><span>Réponses préparées par l’atelier</span></span>' +
+        '<span class="cbt__id"><b>Le conseiller floral</b>' +
+          '<span id="cbt-sous">Fleurs et boutique uniquement</span></span>' +
         '<button class="cbt__x" type="button" aria-label="Fermer le conseiller">&times;</button>' +
       '</div>' +
       '<div class="cbt__fil" id="cbt-fil" role="log" aria-live="polite" aria-relevant="additions"></div>' +
-      '<div class="cbt__bas"><div class="cbt__ch" id="cbt-ch"></div></div>';
+      '<div class="cbt__bas">' +
+        '<form class="cbt__saisie" id="cbt-saisie">' +
+          '<input type="text" id="cbt-txt" autocomplete="off" maxlength="500" ' +
+                 'placeholder="Votre question…" aria-label="Votre question">' +
+          '<button type="submit" aria-label="Envoyer la question">' +
+            '<span aria-hidden="true">&rarr;</span></button>' +
+        '</form>' +
+      '</div>';
     document.body.appendChild(racine);
 
     fil = racine.querySelector('#cbt-fil');
-    bas = racine.querySelector('#cbt-ch');
+    saisie = racine.querySelector('#cbt-saisie');
+    champ = racine.querySelector('#cbt-txt');
+    envoiBtn = saisie.querySelector('button');
+    sousTitre = racine.querySelector('#cbt-sous');
 
     bouton.addEventListener('click', ouvre);
     racine.querySelector('.cbt__x').addEventListener('click', ferme);
+    saisie.addEventListener('submit', envoie);
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && !racine.hidden) ferme();
     });
+
+    verrouille(true);
+    sonde();
+  }
+
+  /* Le proxy tourne-t-il, et avec une clé ? */
+  function sonde() {
+    if (!window.fetch) { horsLigne(); return; }
+    fetch('/api/etat')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (d && d.ia) {
+          enLigne = true;
+          verrouille(false);
+        } else {
+          horsLigne();
+        }
+      })
+      .catch(horsLigne);
+  }
+
+  function horsLigne() {
+    enLigne = false;
+    verrouille(true);
+    champ.placeholder = 'Conseiller indisponible';
+    sousTitre.textContent = 'Hors ligne';
   }
 
   function ouvre() {
@@ -100,8 +105,8 @@
     racine.hidden = false;
     bouton.hidden = true;
     bouton.setAttribute('aria-expanded', 'true');
-    if (!fil.childNodes.length) demarre();
-    else focusChoix();
+    if (!fil.childNodes.length) accueil();
+    if (enLigne && !occupe) champ.focus();
   }
 
   function ferme() {
@@ -111,157 +116,118 @@
     (ouvertPar || bouton).focus();
   }
 
-  /* ---------- messages ---------- */
-  /* le fil défile en smooth : on repousse en bas sur deux temps,
-     sinon un ajout rapide interrompt le défilement précédent */
+  /* Une seule phrase fixe : une invitation à écrire, pas une réponse. */
+  function accueil() {
+    if (enLigne) {
+      bulle('Bonjour. Posez-moi vos questions sur nos fleurs, nos bouquets ou la boutique.', 'elle');
+    } else {
+      bulle('Le conseiller n’est pas joignable depuis cette page. ' +
+            'Vous pouvez composer votre bouquet dans <a href="atelier.html">l’atelier</a> ' +
+            'ou écrire à <b>bonjour@maisonverveine.fr</b>.', 'elle');
+    }
+  }
+
+  /* =========================================================
+     Messages
+     ========================================================= */
   function versLeBas() {
     requestAnimationFrame(function () { fil.scrollTop = fil.scrollHeight; });
     setTimeout(function () { fil.scrollTop = fil.scrollHeight; }, 380);
   }
 
-  function bulle(texte, qui) {
+  /* nos propres textes : ils contiennent du balisage qu'on maîtrise */
+  function bulle(html, qui) {
     var d = document.createElement('div');
     d.className = 'cbt__m cbt__m--' + qui;
-    d.innerHTML = texte;
+    d.innerHTML = html;
     fil.appendChild(d);
     versLeBas();
     return d;
   }
 
-  function ecrit(suite) {
-    if (reduit) { suite(); return; }
+  /* texte saisi et texte du modèle : jamais d'innerHTML.
+     Une réponse contenant du balisage deviendrait une faille XSS. */
+  function bulleTexte(texte, qui) {
+    var d = document.createElement('div');
+    d.className = 'cbt__m cbt__m--' + qui;
+    d.textContent = texte;
+    fil.appendChild(d);
+    versLeBas();
+    return d;
+  }
+
+  function pointsDeSuspension() {
     var d = document.createElement('div');
     d.className = 'cbt__m cbt__m--elle cbt__ecrit';
     d.innerHTML = '<span></span><span></span><span></span>';
+    if (reduit) d.textContent = '…';
     fil.appendChild(d);
     versLeBas();
-    setTimeout(function () { d.remove(); suite(); }, 620);
+    return d;
   }
 
-  function choix(liste, rose) {
-    bas.innerHTML = '';
-    liste.forEach(function (c) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = c.l;
-      if (rose && c.rose) b.className = 'est-rose';
-      if (c.href) {
-        b.addEventListener('click', function () { window.location.href = c.href; });
-      } else {
-        b.addEventListener('click', function () { repond(c); });
-      }
-      bas.appendChild(b);
-    });
-    focusChoix();
+  function verrouille(v) {
+    occupe = v;
+    champ.disabled = v;
+    envoiBtn.disabled = v;
   }
 
-  function focusChoix() {
-    var p = bas.querySelector('button');
-    if (p) p.focus();
-  }
+  /* =========================================================
+     Envoi
+     ========================================================= */
+  function envoie(e) {
+    e.preventDefault();
+    var texte = champ.value.trim();
+    if (!texte || occupe || !enLigne) return;
 
-  /* ---------- déroulé ---------- */
-  function demarre() {
-    etape = 0;
-    etat = { occasion:null, ambiance:null, budget:null };
-    fil.innerHTML = '';
-    bulle('Bonjour. Je vous aide à choisir en trois questions, puis je vous laisse la main.', 'elle');
-    ecrit(function () {
-      bulle('C’est pour quelle occasion&nbsp;?', 'elle');
-      choix(OCCASIONS);
-    });
-  }
+    champ.value = '';
+    bulleTexte(texte, 'moi');
+    histoire.push({ role:'user', content:texte });
+    verrouille(true);
 
-  function repond(c) {
-    bulle(c.l, 'moi');
-    bas.innerHTML = '';
+    var points = pointsDeSuspension();
 
-    if (etape === 0) {
-      etat.occasion = c.id;
-      etape = 1;
-      ecrit(function () {
-        if (c.id === 'deuil') {
-          etat.ambiance = 'blanche';
-          etape = 2;
-          bulle('Nous restons sur du blanc, c’est ce qui convient le mieux. Quel budget avez-vous en tête&nbsp;?', 'elle');
-          choix(BUDGETS);
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: histoire.slice(-MAX_HISTOIRE) })
+    })
+      .then(function (r) {
+        return r.json()
+          .catch(function () { return {}; })
+          .then(function (d) { return { ok:r.ok, d:d }; });
+      })
+      .then(function (res) {
+        points.remove();
+        if (res.ok && res.d && res.d.reponse) {
+          bulleTexte(res.d.reponse, 'elle');
+          histoire.push({ role:'assistant', content:res.d.reponse });
         } else {
-          bulle('Quelle ambiance vous ressemble&nbsp;?', 'elle');
-          choix(AMBIANCES);
+          /* la réponse ratée ne reste pas dans le fil : sinon le modèle
+             recevrait une question orpheline au tour suivant */
+          histoire.pop();
+          echec();
         }
+      })
+      .catch(function () {
+        points.remove();
+        histoire.pop();
+        echec();
+      })
+      .then(function () {
+        verrouille(!enLigne);
+        if (enLigne) champ.focus();
       });
-      return;
-    }
-
-    if (etape === 1) {
-      etat.ambiance = c.id;
-      etape = 2;
-      ecrit(function () {
-        bulle('Et quel budget avez-vous en tête&nbsp;?', 'elle');
-        choix(BUDGETS);
-      });
-      return;
-    }
-
-    if (etape === 2) {
-      etat.budget = c.id;
-      etape = 3;
-      ecrit(conclut);
-    }
   }
 
-  function conclut() {
-    var base = BASE[etat.ambiance] || BASE.douce;
-    var fin = TAILLE[etat.budget] || TAILLE.b;
-    var compo = { p:base.p, s:base.s, f:base.f, t:fin.t, w:fin.w };
-    if (etat.budget === 'd') compo.p = 'pivoine';
-
-    var phrase = INTRO[etat.occasion] || '';
-    var prix = '';
-
-    if (window.MV) {
-      var d = MV.calcul(compo);
-      phrase += ' Je partirais sur ' + d.p.phrase;
-      if (d.s.phrase) phrase += ' avec ' + d.s.phrase;
-      if (d.f.phrase) phrase += ' et ' + d.f.phrase;
-      phrase += ', en format ' + d.t.format + ', emballé en ' + d.e.nom.toLowerCase() + '.';
-      prix = ' Autour de <b>' + MV.euros(d.total) + '</b>.';
-    } else {
-      phrase += ' Je partirais sur une composition ' + (etat.ambiance === 'blanche' ? 'blanche' : 'de saison') + '.';
-    }
-
-    bulle(phrase + prix, 'elle');
-
-    ecrit(function () {
-      var pret = PRET[etat.budget];
-      bulle('Vous pouvez la reprendre telle quelle dans l’atelier, ou partir de <b>' + pret.nom +
-            '</b> (' + pret.prix + '), déjà monté.', 'elle');
-
-      var actions = [
-        { l:'Ouvrir dans l’atelier', rose:true, href:'atelier.html?' + (window.MV ? MV.versUrl(compo) : '') },
-        { l:'Voir ' + pret.nom, href:'index.html#bouquets' }
-      ];
-      if (etat.occasion === 'mariage' || etat.occasion === 'pro') {
-        actions.push({ l:'Demander un devis', href:'devis.html?mode=event' });
-      }
-      actions.push({ l:'Recommencer', id:'reset' });
-
-      choix(actions.map(function (a) {
-        if (a.id === 'reset') return { l:a.l, reset:true };
-        return a;
-      }), true);
-
-      /* le bouton Recommencer n'a pas de lien : on le rebranche */
-      var dernier = bas.lastChild;
-      if (dernier) {
-        var neuf = dernier.cloneNode(true);
-        dernier.replaceWith(neuf);
-        neuf.addEventListener('click', demarre);
-      }
-    });
+  function echec() {
+    bulle('Je n’arrive pas à joindre l’atelier pour le moment. Réessayez dans un instant, ' +
+          'ou écrivez à <b>bonjour@maisonverveine.fr</b>.', 'elle');
   }
 
-  /* ---------- démarrage ---------- */
+  /* =========================================================
+     Démarrage
+     ========================================================= */
   if (document.body) monte();
   else document.addEventListener('DOMContentLoaded', monte);
 })();

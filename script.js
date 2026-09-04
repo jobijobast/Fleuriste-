@@ -22,6 +22,29 @@
     });
   }
 
+  /* ---------- 1 bis. Vidéo du hero ----------
+     On ne met pas l'attribut autoplay dans le HTML : sous
+     prefers-reduced-motion la vidéo doit rester figée sur son
+     affiche. On lance la lecture ici, seulement si le mouvement
+     est accepté, et on laisse le poster si le navigateur refuse. */
+  var video = document.getElementById('hero-video');
+  if (video && !calme) {
+    var lance = function () {
+      var essai = video.play();
+      if (essai && essai.catch) {
+        essai.catch(function () { /* refusée : le poster fait le travail */ });
+      }
+    };
+    lance();
+    /* Un onglet ouvert en arrière-plan ne charge pas la vidéo et refuse la
+       lecture. On retente une fois quand la page devient visible. */
+    document.addEventListener('visibilitychange', function relance() {
+      if (document.visibilityState !== 'visible') return;
+      document.removeEventListener('visibilitychange', relance);
+      if (video.paused) lance();
+    });
+  }
+
   /* ---------- 2. Révélations au scroll, décalées par groupe ---------- */
   var aReveler = document.querySelectorAll('.reveal');
 

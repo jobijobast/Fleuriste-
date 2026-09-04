@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "verveine",
+      "name": "verveine-proxy",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "5199"],
+      "runtimeArgs": ["proxy.py"],
       "port": 5199
     }
   ]

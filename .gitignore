@@ -1,3 +1,7 @@
 .DS_Store
 Thumbs.db
 *.log
+
+# Secrets : ne JAMAIS committer. Le dépôt est public.
+.env
+config.local.js

@@ -54,9 +54,15 @@
 <!-- ============ HERO ============ -->
 <section class="hero">
   <div class="hero__frame">
-    <img class="hero__img"
-         src="https://images.unsplash.com/photo-1525441273400-056e9c7517b3?w=2000&q=80&auto=format&fit=crop"
-         alt="Longue table de réception dressée, compositions de roses pâles et grandes bougies blanches">
+    <!-- La lecture automatique est déclenchée par script.js, jamais par
+         l'attribut autoplay : sous prefers-reduced-motion, la vidéo reste
+         arrêtée et c'est l'affiche (poster) qui s'affiche. -->
+    <video class="hero__img" id="hero-video"
+           muted loop playsinline preload="metadata"
+           poster="https://images.unsplash.com/photo-1525441273400-056e9c7517b3?w=1600&q=70&auto=format&fit=crop"
+           aria-label="Table de réception dressée, compositions de roses pâles et grandes bougies blanches">
+      <source src="media/hero.mp4" type="video/mp4">
+    </video>
     <div class="hero__veil" aria-hidden="true"></div>
 
     <div class="hero__copy">
