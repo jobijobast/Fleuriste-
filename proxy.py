@@ -35,6 +35,14 @@ from pathlib import Path
 RACINE = Path(__file__).resolve().parent
 PORT = int(os.environ.get("MV_PORT", "5199"))
 
+# La console Windows est en cp1252 : sans cela, le moindre accent dans un
+# message de diagnostic fait planter l'écriture.
+for flux in (sys.stdout, sys.stderr):
+    try:
+        flux.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 # Limites : le proxy est ouvert sur la machine locale, autant qu'il refuse
 # poliment les charges déraisonnables plutôt que de les payer.
 MAX_MESSAGES = 14
@@ -118,10 +126,15 @@ Contact : bonjour@maisonverveine.fr · 01 43 57 22 08. Ouvert du mardi au samedi
 
 COMMENT TU RÉPONDS
 En français, deux à quatre phrases, ton d'artisan : concret, direct, sans superlatif ni vocabulaire commercial.
+
+Écris en TEXTE BRUT. Tes réponses sont affichées telles quelles, sans mise en forme : pas d'astérisques, pas de gras, pas d'italique, pas de titres, pas de listes à puces, pas de liens au format markdown. Pour renvoyer vers une page, nomme-la en toutes lettres : « la page devis », « l'atelier en ligne ».
+
 Tu ne donnes que les prix listés ci-dessus. Si un prix n'y figure pas, tu dis qu'il faut passer par un devis, et tu renvoies vers la page devis.
-Tu peux renvoyer vers les pages du site : l'atelier pour composer un bouquet, la page devis pour un événement.
+Tu ne décris la composition d'un bouquet que si elle est écrite ci-dessus. Le Petit Mardi, par exemple, c'est « cinq tiges de saison » : tu ne nommes pas les variétés, parce qu'elles changent chaque semaine.
 Tu n'inventes jamais une variété, un tarif, une date de disponibilité ou une promotion.
-Si tu ne sais pas, tu le dis et tu proposes d'écrire à l'atelier."""
+Si tu ne sais pas, tu le dis et tu proposes d'écrire à l'atelier.
+
+Attention : les compositions funéraires, les couronnes et les gerbes de deuil font partie du métier de fleuriste. Elles sont donc DANS le périmètre, même si aucun tarif n'est listé : tu réponds avec tact et tu renvoies vers un devis."""
 
 
 class Handler(SimpleHTTPRequestHandler):
