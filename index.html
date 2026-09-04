@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com">
 <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="modules.css">
+<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="modules.css?v=4">
 </head>
 <body>
 
@@ -58,7 +58,7 @@
          l'attribut autoplay : sous prefers-reduced-motion, la vidéo reste
          arrêtée et c'est l'affiche (poster) qui s'affiche. -->
     <video class="hero__img" id="hero-video"
-           muted loop playsinline preload="metadata"
+           muted loop playsinline preload="auto"
            poster="https://images.unsplash.com/photo-1525441273400-056e9c7517b3?w=1600&q=70&auto=format&fit=crop"
            aria-label="Table de réception dressée, compositions de roses pâles et grandes bougies blanches">
       <source src="media/hero.mp4" type="video/mp4">
@@ -388,8 +388,8 @@
   <div class="pied__mark" aria-hidden="true">VERVEINE</div>
 </footer>
 
-<script src="script.js" defer></script>
-<script src="bouquet.js" defer></script>
-<script src="chatbot.js" defer></script>
+<script src="script.js?v=4" defer></script>
+<script src="bouquet.js?v=4" defer></script>
+<script src="chatbot.js?v=4" defer></script>
 </body>
 </html>

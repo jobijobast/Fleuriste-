@@ -29,20 +29,34 @@
      est accepté, et on laisse le poster si le navigateur refuse. */
   var video = document.getElementById('hero-video');
   if (video && !calme) {
-    var lance = function () {
-      var essai = video.play();
-      if (essai && essai.catch) {
-        essai.catch(function () { /* refusée : le poster fait le travail */ });
-      }
+    /* La lecture automatique échoue pour des raisons qu'on ne maîtrise pas
+       depuis la page : média pas encore prêt, onglet ouvert en arrière-plan,
+       politique du navigateur. Plutôt qu'un seul essai, on retente à chaque
+       occasion crédible et on s'arrête dès que ça tourne. */
+    var evenements = ['loadeddata', 'canplay', 'canplaythrough'];
+    var gestes = ['pointerdown', 'keydown', 'scroll'];
+
+    var arrete = function () {
+      evenements.forEach(function (e) { video.removeEventListener(e, essaie); });
+      gestes.forEach(function (e) { document.removeEventListener(e, essaie); });
+      document.removeEventListener('visibilitychange', essaie);
     };
-    lance();
-    /* Un onglet ouvert en arrière-plan ne charge pas la vidéo et refuse la
-       lecture. On retente une fois quand la page devient visible. */
-    document.addEventListener('visibilitychange', function relance() {
-      if (document.visibilityState !== 'visible') return;
-      document.removeEventListener('visibilitychange', relance);
-      if (video.paused) lance();
-    });
+
+    function essaie() {
+      if (!video.paused) { arrete(); return; }
+      var p = video.play();
+      if (p && p.then) {
+        p.then(arrete).catch(function (err) {
+          /* on garde une trace : une panne silencieuse est indébogable */
+          if (window.console) console.warn('Hero : lecture refusée (' + err.name + ')');
+        });
+      }
+    }
+
+    essaie();
+    evenements.forEach(function (e) { video.addEventListener(e, essaie); });
+    gestes.forEach(function (e) { document.addEventListener(e, essaie, { passive: true }); });
+    document.addEventListener('visibilitychange', essaie);
   }
 
   /* ---------- 2. Révélations au scroll, décalées par groupe ---------- */
