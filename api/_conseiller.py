@@ -152,6 +152,21 @@ def etat():
     return {"ia": bool(cle), "modele": modele if cle else None}
 
 
+def diagnostic():
+    """Pourquoi la clé n'arrive pas, sans jamais en révéler la valeur.
+
+    On ne renvoie que des NOMS de variables et une longueur. Jamais un
+    contenu : ce point d'entrée est public une fois déployé.
+    """
+    brute = os.environ.get("MV_CLE")
+    return {
+        "mv_cle_definie": brute is not None,
+        "mv_cle_longueur": len(brute.strip()) if isinstance(brute, str) else 0,
+        "variables_mv_visibles": sorted(n for n in os.environ if n.startswith("MV_")),
+        "environnement_vercel": os.environ.get("VERCEL_ENV", "hors Vercel"),
+    }
+
+
 def indice(code, detail=""):
     """Message de diagnostic lisible pour la console de développement."""
     if code == 429:
