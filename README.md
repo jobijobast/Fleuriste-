@@ -83,8 +83,43 @@ python proxy.py
 format OpenAI : Mistral, OpenAI, Groq et autres, en changeant `MV_URL` et
 `MV_MODELE`.
 
-Sans clé, ou sur un hébergement statique sans serveur (GitHub Pages), il n'y a
-pas de modèle à interroger : le widget l'annonce et renvoie vers l'atelier.
+Sans clé, ou sur un hébergement purement statique (GitHub Pages), il n'y a pas
+de modèle à interroger : le widget l'annonce et renvoie vers l'atelier.
+
+### Mise en ligne sur Vercel
+
+Vercel ne fait pas tourner `proxy.py` en continu : il exécute les fichiers de
+`api/` comme fonctions serverless, appelées une par une. `api/chat.py` et
+`api/etat.py` remplissent donc en production le rôle que `proxy.py` remplit en
+local. Les deux importent `api/_conseiller.py`, seule source de vérité du prompt
+et des garde-fous : il n'existe pas deux versions du périmètre.
+
+**La clé ne se met pas dans le dépôt, mais dans les variables d'environnement du
+projet Vercel.**
+
+Par l'interface : *Project → Settings → Environment Variables*, ajouter
+
+| Nom | Valeur | Environnements |
+|---|---|---|
+| `MV_CLE` | votre clé | Production, Preview, Development |
+
+C'est la seule variable indispensable. `MV_URL` et `MV_MODELE` ont pour valeurs
+par défaut Mistral et `open-mistral-nemo` ; ne les ajoutez que pour changer de
+fournisseur ou de modèle.
+
+En ligne de commande, avec la CLI Vercel :
+
+```bash
+vercel env add MV_CLE production
+```
+
+Un redéploiement est nécessaire après l'ajout : une fonction déjà déployée ne
+voit pas les variables créées ensuite.
+
+Pour vérifier que tout est branché, ouvrir `https://votre-projet.vercel.app/api/etat`.
+La réponse attendue est `{"ia": true, "modele": "open-mistral-nemo"}`. Si `ia`
+vaut `false`, la variable n'est pas visible par la fonction : vérifier son nom et
+redéployer.
 
 ### Si le conseiller répond « je n'arrive pas à joindre l'atelier »
 

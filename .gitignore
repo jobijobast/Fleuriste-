@@ -5,3 +5,10 @@ Thumbs.db
 # Secrets : ne JAMAIS committer. Le dépôt est public.
 .env
 config.local.js
+
+# Python
+__pycache__/
+*.pyc
+
+# Vercel
+.vercel
