@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demander un devis · Maison Verveine</title>
+<meta name="description" content="Estimez votre bouquet ou votre événement floral en direct, puis envoyez la demande à l’atelier. Estimation indicative, devis définitif après rendez-vous.">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="modules.css">
+</head>
+<body>
+
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<header class="nav nav--solid" id="nav">
+  <nav class="nav__inner" aria-label="Navigation principale">
+    <ul class="nav__links">
+      <li><a href="index.html">Maison</a></li>
+      <li><a href="index.html#bouquets">Bouquets</a></li>
+      <li><a href="atelier.html">Composer</a></li>
+      <li><a href="index.html#realisations">Réalisations</a></li>
+    </ul>
+    <a class="nav__mark" href="index.html">Maison Verveine</a>
+    <div class="nav__end">
+      <a class="pill pill--dark" href="devis.html" aria-current="page">Commander</a>
+      <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu-mobile">
+        <span class="burger__box" aria-hidden="true"><i></i><i></i></span>
+        <span class="sr">Ouvrir le menu</span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<div class="menu" id="menu-mobile" hidden>
+  <a href="index.html">Maison</a>
+  <a href="index.html#bouquets">Bouquets</a>
+  <a href="atelier.html">Composer</a>
+  <a href="index.html#realisations">Réalisations</a>
+  <a class="menu__cta" href="devis.html">Commander</a>
+</div>
+
+<main class="page" id="contenu">
+
+  <div class="page__head">
+    <p class="label">( <i>02</i> Devis )</p>
+    <h1>Dites-nous ce que vous imaginez, <em>on chiffre.</em></h1>
+    <p>L’estimation se calcule pendant que vous remplissez. Elle reste indicative : le devis définitif est établi après le rendez-vous, une fois le lieu et la date confirmés.</p>
+  </div>
+
+  <div class="onglets" role="tablist" aria-label="Type de demande">
+    <button type="button" role="tab" id="ong-bouquet" aria-selected="true" aria-controls="pan-bouquet">Un bouquet</button>
+    <button type="button" role="tab" id="ong-event" aria-selected="false" aria-controls="pan-event">Un événement</button>
+  </div>
+
+  <form class="devis" id="form" novalidate>
+
+    <div>
+      <!-- ============ BOUQUET ============ -->
+      <div id="pan-bouquet" role="tabpanel" aria-labelledby="ong-bouquet">
+
+        <section class="bloc">
+          <h2>Le bouquet</h2>
+          <div class="grille-champs">
+            <div class="champ champ--large">
+              <label for="quel-bouquet">Que souhaitez-vous&nbsp;?</label>
+              <select id="quel-bouquet" name="quel-bouquet"></select>
+              <p class="aide" id="aide-bouquet"></p>
+            </div>
+          </div>
+
+          <div id="apercu-compo" style="display:flex;gap:20px;align-items:flex-start;margin-top:22px">
+            <div class="bq-stage" style="width:180px;flex:none;padding:10px">
+              <div class="bq" id="bq-mini"></div>
+            </div>
+            <div>
+              <p class="bq-legende" id="legende-mini" style="margin-top:0"></p>
+              <p style="margin-top:12px"><a class="lien-nu" href="atelier.html" id="lien-modifier">Modifier la composition</a></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="bloc">
+          <h2>La livraison</h2>
+          <div class="grille-champs">
+            <div class="champ">
+              <label for="b-date">Date souhaitée</label>
+              <input type="date" id="b-date" name="b-date" required>
+              <p class="erreur" id="e-b-date"></p>
+            </div>
+            <div class="champ">
+              <label for="b-mode">Retrait ou livraison</label>
+              <select id="b-mode" name="b-mode">
+                <option value="retrait">Retrait à l’atelier (gratuit)</option>
+                <option value="paris" selected>Livraison à vélo dans Paris (8 €)</option>
+                <option value="pc">Livraison petite couronne (18 €)</option>
+              </select>
+            </div>
+            <div class="champ champ--large">
+              <label for="b-adresse">Adresse de livraison</label>
+              <input type="text" id="b-adresse" name="b-adresse" placeholder="14 rue des Trois-Bornes, 75011 Paris">
+              <p class="aide">Laissez vide si vous venez chercher le bouquet à l’atelier.</p>
+            </div>
+            <div class="champ champ--large">
+              <label for="b-carte">Message sur la carte</label>
+              <textarea id="b-carte" name="b-carte" maxlength="240" placeholder="Écrit à la main par nos soins, 240 caractères maximum."></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============ ÉVÉNEMENT ============ -->
+      <div id="pan-event" role="tabpanel" aria-labelledby="ong-event" hidden>
+
+        <section class="bloc">
+          <h2>L’événement</h2>
+          <div class="grille-champs">
+            <div class="champ">
+              <label for="e-type">Type d’événement</label>
+              <select id="e-type" name="e-type">
+                <option value="Mariage">Mariage</option>
+                <option value="Événement d’entreprise">Événement d’entreprise</option>
+                <option value="Célébration privée">Célébration privée</option>
+              </select>
+            </div>
+            <div class="champ">
+              <label for="e-date">Date</label>
+              <input type="date" id="e-date" name="e-date" required>
+              <p class="erreur" id="e-e-date"></p>
+            </div>
+            <div class="champ">
+              <label for="e-invites">Nombre d’invités</label>
+              <input type="number" id="e-invites" name="e-invites" min="2" max="600" value="80" required>
+              <p class="aide">Sert à pré-remplir le nombre de tables.</p>
+            </div>
+            <div class="champ">
+              <label for="e-km">Distance depuis Paris</label>
+              <input type="number" id="e-km" name="e-km" min="0" max="1200" value="0">
+              <p class="aide">En kilomètres. 2,40 € du kilomètre aller-retour au-delà de 30 km.</p>
+            </div>
+            <div class="champ champ--large">
+              <label for="e-lieu">Lieu</label>
+              <input type="text" id="e-lieu" name="e-lieu" placeholder="Nom du domaine, de la salle ou de l’adresse">
+            </div>
+          </div>
+        </section>
+
+        <section class="bloc">
+          <h2>Les prestations</h2>
+
+          <div class="presta">
+            <div class="presta__l" data-actif="0">
+              <input type="checkbox" id="p-arche" data-prix="480">
+              <label class="presta__n" for="p-arche">Arche florale<span class="presta__d">Structure, mousse florale, fleurs et pose sur site</span></label>
+              <span class="presta__p">480 €</span>
+            </div>
+
+            <div class="presta__l" data-actif="0">
+              <input type="checkbox" id="p-centres" data-prix="45" data-q="q-centres">
+              <label class="presta__n" for="p-centres">Centres de table<span class="presta__d">Composition basse, une par table</span></label>
+              <input class="presta__q" type="number" id="q-centres" min="1" max="60" value="10" aria-label="Nombre de tables">
+              <span class="presta__p">45 € / table</span>
+            </div>
+
+            <div class="presta__l" data-actif="0">
+              <input type="checkbox" id="p-mariee" data-prix="120">
+              <label class="presta__n" for="p-mariee">Bouquet de mariée<span class="presta__d">Avec sa réplique pour le lancer</span></label>
+              <span class="presta__p">120 €</span>
+            </div>
+
+            <div class="presta__l" data-actif="0">
+              <input type="checkbox" id="p-bouton" data-prix="12" data-q="q-bouton">
+              <label class="presta__n" for="p-bouton">Boutonnières<span class="presta__d">Montées sur épingle, livrées en boîte fraîche</span></label>
+              <input class="presta__q" type="number" id="q-bouton" min="1" max="60" value="6" aria-label="Nombre de boutonnières">
+              <span class="presta__p">12 € pièce</span>
+            </div>
+
+            <div class="presta__l" data-actif="0">
+              <input type="checkbox" id="p-chemin" data-prix="90" data-q="q-chemin">
+              <label class="presta__n" for="p-chemin">Chemin de table fleuri<span class="presta__d">Guirlande basse en fleurs et feuillage</span></label>
+              <input class="presta__q" type="number" id="q-chemin" min="1" max="80" value="6" aria-label="Longueur en mètres">
+              <span class="presta__p">90 € / mètre</span>
+            </div>
+
+            <div class="presta__l" data-actif="0">
+              <input type="checkbox" id="p-install" data-prix="250">
+              <label class="presta__n" for="p-install">Installation sur place<span class="presta__d">Équipe présente jusqu’à l’ouverture des portes</span></label>
+              <span class="presta__p">250 €</span>
+            </div>
+
+            <div class="presta__l" data-actif="0">
+              <input type="checkbox" id="p-demont" data-prix="150">
+              <label class="presta__n" for="p-demont">Démontage le lendemain<span class="presta__d">Reprise du matériel et don des fleurs encore fraîches</span></label>
+              <span class="presta__p">150 €</span>
+            </div>
+          </div>
+          <p class="erreur" id="e-presta"></p>
+        </section>
+      </div>
+
+      <!-- ============ COORDONNÉES ============ -->
+      <section class="bloc">
+        <h2>Vous</h2>
+        <div class="grille-champs">
+          <div class="champ">
+            <label for="c-nom">Nom et prénom</label>
+            <input type="text" id="c-nom" name="c-nom" autocomplete="name" required>
+            <p class="erreur" id="e-c-nom"></p>
+          </div>
+          <div class="champ">
+            <label for="c-mail">Adresse e-mail</label>
+            <input type="email" id="c-mail" name="c-mail" autocomplete="email" required>
+            <p class="erreur" id="e-c-mail"></p>
+          </div>
+          <div class="champ">
+            <label for="c-tel">Téléphone</label>
+            <input type="tel" id="c-tel" name="c-tel" autocomplete="tel" placeholder="06 12 34 56 78">
+          </div>
+          <div class="champ">
+            <label for="c-source">Comment nous avez-vous connus&nbsp;?</label>
+            <select id="c-source" name="c-source">
+              <option value="">Sans réponse</option>
+              <option>Bouche à oreille</option>
+              <option>Instagram</option>
+              <option>En passant devant l’atelier</option>
+              <option>Un lieu de réception</option>
+            </select>
+          </div>
+          <div class="champ champ--large">
+            <label for="c-mot">Ce que vous imaginez</label>
+            <textarea id="c-mot" name="c-mot" placeholder="Une ambiance, des couleurs, une contrainte de budget, une inspiration : tout nous est utile."></textarea>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ ESTIMATION ============ -->
+    <aside class="estim" aria-label="Estimation">
+      <p class="estim__k">Estimation indicative</p>
+      <p class="estim__p" id="fourchette" aria-live="polite">&nbsp;</p>
+      <p class="estim__note" id="estim-note">Devis définitif après rendez-vous.</p>
+
+      <ul class="estim__lignes" id="estim-lignes"></ul>
+      <p class="estim__vide" id="estim-vide" hidden>Cochez au moins une prestation pour voir une estimation.</p>
+
+      <div class="actions">
+        <button class="pill pill--dark" type="submit">Envoyer la demande <span aria-hidden="true">&rarr;</span></button>
+        <button class="pill" type="button" id="imprimer" style="border-color:rgba(14,14,14,.2)">Imprimer</button>
+      </div>
+
+      <div class="envoi-ok" id="envoi-ok" hidden></div>
+    </aside>
+
+  </form>
+</main>
+
+<footer class="pied">
+  <div class="pied__top">
+    <div class="pied__bloc">
+      <h2>Créer quelque chose <em>dont on se souvient.</em></h2>
+      <a class="pill pill--ghost" href="atelier.html">Composer un bouquet <span aria-hidden="true">&rarr;</span></a>
+    </div>
+    <nav class="pied__nav" aria-label="Pied de page">
+      <div>
+        <h3>Explorer</h3>
+        <a href="index.html">Maison</a>
+        <a href="index.html#bouquets">Bouquets</a>
+        <a href="atelier.html">Composer</a>
+        <a href="devis.html">Devis</a>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <a href="mailto:bonjour@maisonverveine.fr">bonjour@maisonverveine.fr</a>
+        <a href="tel:+33143572208">01 43 57 22 08</a>
+        <span>14 rue des Trois-Bornes<br>75011 Paris</span>
+      </div>
+    </nav>
+  </div>
+  <p class="pied__legal">© 2026 Maison Verveine. Tous droits réservés. Photographies Unsplash.</p>
+  <div class="pied__mark" aria-hidden="true">VERVEINE</div>
+</footer>
+
+<script src="script.js" defer></script>
+<script src="bouquet.js" defer></script>
+<script src="devis.js" defer></script>
+<script src="chatbot.js" defer></script>
+</body>
+</html>

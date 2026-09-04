@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Composer son bouquet · Maison Verveine</title>
+<meta name="description" content="Composez votre bouquet tige par tige : fleur principale, accompagnement, feuillage, taille et emballage. Le prix se met à jour en direct.">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="modules.css">
+</head>
+<body>
+
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<header class="nav nav--solid" id="nav">
+  <nav class="nav__inner" aria-label="Navigation principale">
+    <ul class="nav__links">
+      <li><a href="index.html">Maison</a></li>
+      <li><a href="index.html#bouquets">Bouquets</a></li>
+      <li><a href="atelier.html" aria-current="page">Composer</a></li>
+      <li><a href="index.html#realisations">Réalisations</a></li>
+    </ul>
+    <a class="nav__mark" href="index.html">Maison Verveine</a>
+    <div class="nav__end">
+      <a class="pill pill--dark" href="devis.html">Commander</a>
+      <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu-mobile">
+        <span class="burger__box" aria-hidden="true"><i></i><i></i></span>
+        <span class="sr">Ouvrir le menu</span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<div class="menu" id="menu-mobile" hidden>
+  <a href="index.html">Maison</a>
+  <a href="index.html#bouquets">Bouquets</a>
+  <a href="atelier.html">Composer</a>
+  <a href="index.html#realisations">Réalisations</a>
+  <a class="menu__cta" href="devis.html">Commander</a>
+</div>
+
+<main class="page" id="contenu">
+
+  <div class="page__head">
+    <p class="label">( <i>01</i> Atelier )</p>
+    <h1>Composez votre bouquet, <em>tige par tige.</em></h1>
+    <p>Quatre choix, et le bouquet se dessine à côté de vous. Le prix suit en direct, sans engagement : vous pouvez repartir avec la composition vers un devis, ou tout recommencer.</p>
+  </div>
+
+  <div class="sans-js">
+    <p><b>Le composeur a besoin de JavaScript pour dessiner votre bouquet.</b></p>
+    <p style="margin-top:10px">Activez-le, ou parcourez nos <a class="lien-nu" href="index.html#bouquets">bouquets déjà prêts</a>. Vous pouvez aussi nous écrire directement à <a class="lien-nu" href="mailto:bonjour@maisonverveine.fr">bonjour@maisonverveine.fr</a> en décrivant ce que vous imaginez.</p>
+  </div>
+
+  <div class="compo" id="compo" hidden>
+
+    <div class="compo__vue">
+      <div class="bq-stage">
+        <div class="bq" id="bq"></div>
+      </div>
+      <p class="bq-legende" id="legende"></p>
+
+      <div class="total">
+        <div class="total__l">
+          <span class="total__k">Votre bouquet</span>
+          <span class="total__p" id="total" aria-live="polite">&nbsp;</span>
+        </div>
+        <details class="detail">
+          <summary>Voir le détail</summary>
+          <ul id="detail"></ul>
+        </details>
+        <div class="actions">
+          <a class="pill pill--dark" id="vers-devis" href="devis.html">Demander un devis <span aria-hidden="true">&rarr;</span></a>
+          <button class="pill" id="reset" type="button" style="border-color:rgba(14,14,14,.2)">Recommencer</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="compo__etapes" id="etapes"></div>
+  </div>
+
+  <section class="renvoi">
+    <h2>Vous préférez qu’on s’en charge&nbsp;?</h2>
+    <a class="pill pill--dark" href="index.html#bouquets">Voir les bouquets prêts <span aria-hidden="true">&rarr;</span></a>
+  </section>
+
+</main>
+
+<footer class="pied">
+  <div class="pied__top">
+    <div class="pied__bloc">
+      <h2>Créer quelque chose <em>dont on se souvient.</em></h2>
+      <a class="pill pill--ghost" href="devis.html">Commander <span aria-hidden="true">&rarr;</span></a>
+    </div>
+    <nav class="pied__nav" aria-label="Pied de page">
+      <div>
+        <h3>Explorer</h3>
+        <a href="index.html">Maison</a>
+        <a href="index.html#bouquets">Bouquets</a>
+        <a href="atelier.html">Composer</a>
+        <a href="devis.html">Devis</a>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <a href="mailto:bonjour@maisonverveine.fr">bonjour@maisonverveine.fr</a>
+        <a href="tel:+33143572208">01 43 57 22 08</a>
+        <span>14 rue des Trois-Bornes<br>75011 Paris</span>
+      </div>
+    </nav>
+  </div>
+  <p class="pied__legal">© 2026 Maison Verveine. Tous droits réservés. Photographies Unsplash.</p>
+  <div class="pied__mark" aria-hidden="true">VERVEINE</div>
+</footer>
+
+<script src="script.js" defer></script>
+<script src="bouquet.js" defer></script>
+<script src="atelier.js" defer></script>
+<script src="chatbot.js" defer></script>
+</body>
+</html>
